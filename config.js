@@ -1,9 +1,3 @@
-export default {
-  oidc: {
-     oktaUrl: "-",
-     clientId: "-",
-     clientSecret: "-",
-     redirectUri: "http://localhost:8080/authorization"
-  },
+module.exports = {
    port: process.env.PORT || 8080
 }
