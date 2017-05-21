@@ -3,38 +3,71 @@
   <body>
     <script src="https://ok1static.oktacdn.com/assets/js/sdk/okta-auth-js/1.5.0/OktaAuth.min.js" type="text/javascript"></script>
 
-    <button id="login" name="wow-awesome-login-buttton-long-name-for-no-reason-yeah">
-      LOGINNNNNNNNNN, NOWWWWWWWW.
-    </button>
-
     <script>
       const authClient = new OktaAuth({
         url: 'https://dev-612294.oktapreview.com',
         clientId: '-',
         redirectUri: 'http://localhost:8080',
-        scopes: ['openid', 'email', 'profile'],
+        scopes: ['openid', 'name', 'email', 'profile'],
       })
 
-      const button = document.querySelector('button[name="wow-awesome-login-buttton-long-name-for-no-reason-yeah"]')
+      authClient
+        .token
+        .parseFromUrl()
+        .then(response => {
+          // authClient.token.decode(accessToken);
+          // Manage token or tokens
+          console.log(response)
+          window.sessionStorage.setItem('session', JSON.stringify(response))
+          const myHeaders = new Headers();
+          const options = { method: 'GET', headers: { 'Authorization': `Bearer ${response.idToken}` } }
 
-      button.addEventListener('click', () => {
-        authClient
-          .token
-          .getWithRedirect({ responseType: 'code' })
-      })
+          fetch('/authenticated-yo', options)
+            .then(response => response.blob())
+            .then(myBlob => {
+              console.log(myBlob)
+            })
+        })
+        .catch(err => {
+          // Handle OAuthError
+          console.log('err', err)
+        })
 
-      // If the token is in the url after the redirect
-      // authClient
-      //   .token
-      //   .parseFromUrl()
-      //   .then(({ accessToken }) => {
-      //     // authClient.token.decode(accessToken);
-      //     // Manage token or tokens
-      //   })
-      //   .catch(err => {
-      //     // Handle OAuthError
-      //     console.log('err', err)
-      //   })
+      const html = renderView({ session: window.sessionStorage.getItem('session'), whatever: 1 })
+      document.querySelector('body').innerHTML = html
+      bindEvents('button[name="wow-awesome-login-buttton-long-name-for-no-reason-yeah"]', authClient)
+
+
+        function renderView(model) {
+          const session = model.session
+
+          return `
+            <div>
+              <h1>Welcome, this is an OKTA SPA play around</h1>
+              ${session
+                ? `<p>It appear you are logged in, pie in the sky is happy.</p>`
+                : `<p>You must log in, or else.</p>
+                  <div>
+                    <button id="login" name="wow-awesome-login-buttton-long-name-for-no-reason-yeah">
+                      LOGINNNNNNNNNN, NOWWWWWWWW.
+                      </button>
+                  </div>
+                `
+              }
+            </div>
+          `
+        }
+
+        function bindEvents(query, authClient) {
+          const button = document.querySelector(query)
+          if (button) {
+            button.addEventListener('click', () => {
+              authClient
+                .token
+                .getWithRedirect({ responseType: 'id_token' })
+            })
+          }
+        }
     </script>
   </body>
 </html>
