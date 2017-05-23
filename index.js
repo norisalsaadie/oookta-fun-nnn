@@ -25,8 +25,6 @@ express()
     }
     const decoded = jws.decode(auth)
 
-    console.log(decoded)
-
     if (!decoded) {
       return res.status(401).send('id_token could not be decoded from the response')
     }
@@ -42,7 +40,6 @@ express()
         url: `${config.oktaUrl}/oauth2/v1/keys`,
         json: true,
       }
-      console.log("HELLO2")
 
       request(options, (err, resp, json) => {
         if (err) {
@@ -101,9 +98,6 @@ express()
       return res.json({ claims })
     })
     .catch(err => res.status(500).send(`Error! ${JSON.stringify(err)}`))
-  })
-  .post('/create-user', (req, res, next) => {
-    
   })
   .listen(PORT, () => {
     console.log(`server up and listening on ${PORT}`)

@@ -58,10 +58,10 @@
           `
         }
 
-        function bindEvents(query, authClient) {
-          const button = document.querySelector(query)
-          if (button) {
-            button.addEventListener('click', () => {
+        function bindEvents(loginSelector, authClient) {
+          const loginButton = document.querySelector(loginSelector)
+          if (loginButton) {
+            loginButton.addEventListener('click', () => {
               authClient
                 .token
                 .getWithRedirect({ responseType: 'id_token' })
